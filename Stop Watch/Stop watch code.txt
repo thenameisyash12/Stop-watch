@@ -1,0 +1,49 @@
+import time
+import threading
+from IPython.display import display, clear_output
+from datetime import datetime
+
+# Global flags
+stopwatch_running = False
+stopwatch_reset = False
+elapsed_time = 0
+
+def update_display():
+    while True:
+        if stopwatch_running:
+            global elapsed_time
+            elapsed_time += 1
+        mins, secs = divmod(elapsed_time, 60)
+        hours, mins = divmod(mins, 60)
+        stopwatch = f"{hours:02}:{mins:02}:{secs:02}"
+        current_time = datetime.now().strftime("%H:%M:%S")
+        
+        clear_output(wait=True)
+        print(f"🕒 Clock: {current_time}")
+        print(f"⏱ Stopwatch: {stopwatch}")
+        print("\nType one of the following commands in a new cell:")
+        print("- start_stopwatch()")
+        print("- stop_stopwatch()")
+        print("- reset_stopwatch()")
+        
+        time.sleep(1)
+
+def start_stopwatch():
+    global stopwatch_running
+    stopwatch_running = True
+
+def stop_stopwatch():
+    global stopwatch_running
+    stopwatch_running = False
+
+def reset_stopwatch():
+    global elapsed_time, stopwatch_reset
+    elapsed_time = 0
+    stopwatch_reset = True
+    clear_output(wait=True)
+    print("✅ Stopwatch reset. Run start_stopwatch() to begin again.")
+
+# Start display thread only once
+if 'display_thread' not in globals():
+    display_thread = threading.Thread(target=update_display, daemon=True)
+    display_thread.start()
